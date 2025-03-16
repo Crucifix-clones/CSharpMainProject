@@ -14,15 +14,77 @@ namespace UnitBrains.Player
         private bool _overheated;
         
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
+
+        // Проверка на перегрев
+            if (GetTemperature() >= OverheatTemperature)
+            {
+                return; // Если перегрев, выходим из метода
+            }
+
+            // Генерация снарядов
+            int projectileCount = GetProjectileCount();
+            for (int i = 0; i < projectileCount; i++)
+            {
+                var projectile = CreateProjectile(forTarget);
+                AddProjectileToList(projectile, intoList);
+            }
+
+            // Увеличиваем температуру после выстрела
+            IncreaseTemperature();
+
+            // Проверка на перегрев после увеличения температуры
+            if (GetTemperature() >= OverheatTemperature)
+            {
+                _overheated = true;
+                _cooldownTime = OverheatCooldown; // Устанавливаем время для охлаждения
+            }
+        }
+// Получить количество снарядов в зависимости от температуры
+private int GetProjectileCount()
         {
-            float overheatTemperature = OverheatTemperature;
+            if (_temperature < 1f) return 1; // Если температура меньше 1, возвращаем 1 снаряд
+            if (_temperature < 2f) return 2; // Если температура меньше 2, возвращаем 2 снаряда
+            return 3; // Если температура 3 или больше, возвращаем 3 снаряда
+        }
+
+        // Получить текущую температуру
+        private float GetTemperature()
+        {
+            return _temperature; // Возвращаем текущую температуру
+        }
+
+        // Увеличить температуру на 1
+        private void IncreaseTemperature()
+        {
+            _temperature += 1f; // Увеличиваем температуру на 1 за каждый выстрел
+        }
+
+        // Метод для охлаждения
+        private void CoolDown()
+        {
+            if (_overheated)
+            {
+                _cooldownTime -= Time.deltaTime; // Уменьшаем время охлаждения
+                if (_cooldownTime <= 0)
+                {
+                    _overheated = false; // Сбрасываем состояние перегрева
+                    _temperature = 0f; // Сбрасываем температуру
+                }
+            }
+        }
+
+        // Метод обновления, который вызывается каждый кадр
+        private void Update()
+        {
+            CoolDown(); // Вызываем метод охлаждения в каждом кадре
+        }
+            //float overheatTemperature = OverheatTemperature;
             ///////////////////////////////////////
             // Homework 1.3 (1st block, 3rd module)
             ///////////////////////////////////////           
-            var projectile = CreateProjectile(forTarget);
-            AddProjectileToList(projectile, intoList);
+            //var projectile = CreateProjectile(forTarget);
+            //AddProjectileToList(projectile, intoList);
             ///////////////////////////////////////
-        }
 
         public override Vector2Int GetNextStep()
         {
