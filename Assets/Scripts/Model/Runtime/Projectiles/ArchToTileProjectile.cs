@@ -29,8 +29,13 @@ namespace Model.Runtime.Projectiles
             ///////////////////////////////////////
             // Insert you code here
             ///////////////////////////////////////
+            float timeOffset = t - 0.5f; // Calculating `t-0.5`
+            float timeOffsetSquared = Mathf.Pow(timeOffset, 2); // Calculating (t-0.5)^2
+            float parabolicBase = -4f * timeOffsetSquared + 1f; // Calculating -4 * (t-0.5)^2 + 1
 
+            float maxHeight = 0.6f * totalDistance; // Calculates the max height as 60% of totalDistance
 
+            localHeight = parabolicBase * maxHeight; // Calculate the final localHeight
             ///////////////////////////////////////
             // End of the code to insert
             ///////////////////////////////////////
